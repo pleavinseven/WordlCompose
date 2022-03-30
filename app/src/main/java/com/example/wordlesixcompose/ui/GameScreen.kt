@@ -178,11 +178,7 @@ fun MyKeyboardButton(text: String, width: Int) {
 
     Button(
         onClick = {
-            if (guessArray.size == 0) {
-                guessArray.add(text)
-            } else {
-                guessArray.add(guessArray.size - 1, text)
-            }
+            guessArray.add(text)
             println(viewModel.guessArray.size)
         },
         modifier = Modifier
