@@ -1,33 +1,26 @@
 package com.example.wordlesixcompose.ui
 
-import android.graphics.drawable.Icon
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.wordlesixcompose.HomeViewModel
 import com.example.wordlesixcompose.R
-import com.example.wordlesixcompose.ui.theme.WordleSixComposeTheme
+
+
+val viewModel = HomeViewModel()
+val guessArray = viewModel.guessArray
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
@@ -37,14 +30,24 @@ fun HomeScreen() {
             .fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(40.dp)
+        )
         Column(
-            modifier = Modifier.fillMaxWidth().weight(1f)
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
         ) {
             WordGrid()
         }
-        Column(modifier = Modifier
-            .fillMaxWidth().padding(0.dp, 4.dp),
-            verticalArrangement = Arrangement.Bottom) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(0.dp, 4.dp),
+            verticalArrangement = Arrangement.Bottom
+        ) {
             Keyboard()
         }
     }
@@ -63,31 +66,47 @@ fun Title() {
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WordGrid() {
-    LazyVerticalGrid(
-        cells = GridCells.Fixed(6),
-        modifier = Modifier,
-        state = rememberLazyListState(),
-
-        ) {
-        items(30) { item ->
-            Card(
-                modifier = Modifier
-                    .padding(4.dp, 8.dp)
-                    .aspectRatio(1f),
-                backgroundColor = Color.White,
-                border = BorderStroke(2.dp, Color.Black),
-            ) {
-                Text(
-                    text = "",
-                    fontSize = 24.sp,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(24.dp)
-                )
-            }
-        }
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+        MyCard("")
+        MyCard("")
+        MyCard("")
+        MyCard("")
+        MyCard("")
+        MyCard("")
+    }
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+        MyCard("")
+        MyCard("")
+        MyCard("")
+        MyCard("")
+        MyCard("")
+        MyCard("")
+    }
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+        MyCard("")
+        MyCard("")
+        MyCard("")
+        MyCard("")
+        MyCard("")
+        MyCard("")
+    }
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+        MyCard("")
+        MyCard("")
+        MyCard("")
+        MyCard("")
+        MyCard("")
+        MyCard("")
+    }
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+        MyCard("")
+        MyCard("")
+        MyCard("")
+        MyCard("")
+        MyCard("")
+        MyCard("")
     }
 }
 
@@ -105,11 +124,6 @@ fun Keyboard() {
         MyKeyboardButton(text = "I", 35)
         MyKeyboardButton(text = "O", 35)
         MyKeyboardButton(text = "P", 35)
-
-//        Button(onClick = { /*TODO*/ }, Modifier.weight(1F)) {
-//            Text(text = "Q", textAlign = TextAlign.Center)
-//        }
-
     }
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
         MyKeyboardButton(text = "A", width = 40)
@@ -123,7 +137,7 @@ fun Keyboard() {
         MyKeyboardButton(text = "L", width = 40)
     }
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-        MyKeyboardButton(text = "Enter", width = 70)
+        MyEnterButton()
         MyKeyboardButton(text = "Z", width = 35)
         MyKeyboardButton(text = "X", width = 36)
         MyKeyboardButton(text = "C", width = 36)
@@ -131,32 +145,82 @@ fun Keyboard() {
         MyKeyboardButton(text = "B", width = 36)
         MyKeyboardButton(text = "N", width = 36)
         MyKeyboardButton(text = "M", width = 36)
-//        IconButton(onClick = { /*TODO*/ }, modifier = Modifier.width(35.dp).background(Color.Blue)) {
-//            Icon(Icons.Filled.KeyboardArrowLeft, contentDescription = "Back")
-//        }
-        Button(onClick = { /*TODO*/ },
-            modifier = Modifier
-                .width(50.dp)
-                .height(60.dp)
-                .padding(0.dp, 2.dp),
-            colors = ButtonDefaults.buttonColors(backgroundColor = Color.LightGray)
-                ) {
-            Icon(
-                Icons.Filled.KeyboardArrowLeft,
-                contentDescription = "Back"
-            )
-        }
+        MyBackButton()
+
+    }
+}
+
+@Composable
+fun MyCard(text: String) {
+    Card(
+        modifier = Modifier
+            .padding(4.dp, 8.dp)
+            .height(55.dp)
+            .aspectRatio(1f),
+        backgroundColor = Color.White,
+        border = BorderStroke(2.dp, Color.Black),
+    ) {
+        Text(
+            text = text,
+            fontSize = 24.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(24.dp)
+        )
     }
 }
 
 @Composable
 fun MyKeyboardButton(text: String, width: Int) {
-    Button(onClick = { /*TODO*/ },
+
+    var buttonColour by remember {
+        mutableStateOf(Color.LightGray)
+    }
+
+    Button(
+        onClick = {
+            if (guessArray.size == 0) {
+                guessArray.add(text)
+            } else {
+                guessArray.add(guessArray.size - 1, text)
+            }
+            println(viewModel.guessArray.size)
+        },
         modifier = Modifier
             .width(width.dp)
             .height(60.dp)
             .padding(0.dp, 2.dp),
-        colors = ButtonDefaults.buttonColors(backgroundColor = Color.LightGray)) {
+        colors = ButtonDefaults.buttonColors(backgroundColor = buttonColour)
+    ) {
         Text(text = text, textAlign = TextAlign.Center)
     }
+}
+
+@Composable
+fun MyBackButton() {
+    Button(
+        onClick = { /*TODO*/ },
+        modifier = Modifier
+            .width(50.dp)
+            .height(60.dp)
+            .padding(0.dp, 2.dp),
+        colors = ButtonDefaults.buttonColors(backgroundColor = Color.LightGray)
+    ) {
+        Icon(
+            Icons.Filled.KeyboardArrowLeft,
+            contentDescription = "Back"
+        )
+    }
+}
+
+@Composable
+fun MyEnterButton() {
+    Button(
+        onClick = { viewModel.checkLetterPlacementIsCorrect() },
+        modifier = Modifier
+            .width(70.dp)
+            .height(60.dp)
+            .padding(0.dp, 2.dp),
+        colors = ButtonDefaults.buttonColors(backgroundColor = Color.LightGray)
+    )
+    { Text(text = "Enter", textAlign = TextAlign.Center) }
 }
