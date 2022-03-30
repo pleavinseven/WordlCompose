@@ -172,7 +172,7 @@ fun MyCard(text: String) {
 @Composable
 fun MyKeyboardButton(text: String, width: Int) {
 
-    var buttonColour by remember {
+    val buttonColour by remember {
         mutableStateOf(Color.LightGray)
     }
 
