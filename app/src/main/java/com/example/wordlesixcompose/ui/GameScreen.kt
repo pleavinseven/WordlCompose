@@ -40,7 +40,7 @@ fun HomeScreen() {
                 .fillMaxWidth()
                 .weight(1f)
         ) {
-            WordGrid()
+            CardRow()
         }
         Column(
             modifier = Modifier
@@ -69,7 +69,6 @@ fun Title() {
 @Composable
 fun WordGrid() {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-        MyCard("")
         MyCard("")
         MyCard("")
         MyCard("")
@@ -180,6 +179,8 @@ fun MyKeyboardButton(text: String, width: Int) {
         onClick = {
             guessArray.add(text)
             println(viewModel.guessArray.size)
+            viewModel.cards[viewModel.row] = text
+            viewModel.row++
         },
         modifier = Modifier
             .width(width.dp)
@@ -194,7 +195,7 @@ fun MyKeyboardButton(text: String, width: Int) {
 @Composable
 fun MyBackButton() {
     Button(
-        onClick = { /*TODO*/ },
+        onClick = { },
         modifier = Modifier
             .width(50.dp)
             .height(60.dp)
@@ -219,4 +220,19 @@ fun MyEnterButton() {
         colors = ButtonDefaults.buttonColors(backgroundColor = Color.LightGray)
     )
     { Text(text = "Enter", textAlign = TextAlign.Center) }
+}
+
+@Composable
+fun CardRow(){
+    viewModel.cards.chunked(6).forEach { rowCards ->
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            rowCards.forEach {
+                MyCard(it)
+                println(it)
+            }
+        }
+    }
 }
