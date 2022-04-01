@@ -6,6 +6,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -40,7 +41,7 @@ fun HomeScreen() {
                 .fillMaxWidth()
                 .weight(1f)
         ) {
-            CardRow()
+            WordGrid()
         }
         Column(
             modifier = Modifier
@@ -68,45 +69,12 @@ fun Title() {
 
 @Composable
 fun WordGrid() {
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-        MyCard("")
-        MyCard("")
-        MyCard("")
-        MyCard("")
-        MyCard("")
-    }
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-        MyCard("")
-        MyCard("")
-        MyCard("")
-        MyCard("")
-        MyCard("")
-        MyCard("")
-    }
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-        MyCard("")
-        MyCard("")
-        MyCard("")
-        MyCard("")
-        MyCard("")
-        MyCard("")
-    }
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-        MyCard("")
-        MyCard("")
-        MyCard("")
-        MyCard("")
-        MyCard("")
-        MyCard("")
-    }
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-        MyCard("")
-        MyCard("")
-        MyCard("")
-        MyCard("")
-        MyCard("")
-        MyCard("")
-    }
+    CardRow()
+    CardRow()
+    CardRow()
+    CardRow()
+    CardRow()
+
 }
 
 
@@ -159,12 +127,14 @@ fun MyCard(text: String) {
         backgroundColor = Color.White,
         border = BorderStroke(2.dp, Color.Black),
     ) {
-        Text(
-            text = text,
-            fontSize = 24.sp,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(24.dp)
-        )
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text(
+                text = text,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+                )
+        }
+
     }
 }
 
@@ -195,7 +165,7 @@ fun MyKeyboardButton(text: String, width: Int) {
 @Composable
 fun MyBackButton() {
     Button(
-        onClick = { },
+        onClick = { viewModel.removeLetter()},
         modifier = Modifier
             .width(50.dp)
             .height(60.dp)
@@ -223,7 +193,7 @@ fun MyEnterButton() {
 }
 
 @Composable
-fun CardRow(){
+fun CardRow() {
     viewModel.cards.chunked(6).forEach { rowCards ->
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -231,7 +201,6 @@ fun CardRow(){
         ) {
             rowCards.forEach {
                 MyCard(it)
-                println(it)
             }
         }
     }

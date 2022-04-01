@@ -29,4 +29,8 @@ class HomeViewModel : ViewModel() {
 
     }
 
+    fun removeLetter() {
+        TODO("Not yet implemented")
+    }
+
 }
