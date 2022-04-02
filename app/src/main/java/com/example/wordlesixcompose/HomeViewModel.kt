@@ -2,14 +2,11 @@ package com.example.wordlesixcompose
 
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import java.util.concurrent.Flow
 
 class HomeViewModel : ViewModel() {
 
-    var guessArray: MutableList<String> = ArrayList()
-    var row = 0
-    val cards =  List(6) { "" }.toMutableStateList()
+    var guessArray = List(6) { "" }.toMutableStateList()
+    var column = 0
 
 
     fun checkLetterPlacementIsCorrect() {
@@ -21,7 +18,6 @@ class HomeViewModel : ViewModel() {
                 setColour(letter, 0)
                 println("gray")
             }
-            row += 1
         }
     }
 
@@ -30,7 +26,7 @@ class HomeViewModel : ViewModel() {
     }
 
     fun removeLetter() {
-        TODO("Not yet implemented")
+        guessArray[column - 1] = ""
+        column--
     }
-
 }

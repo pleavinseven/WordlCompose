@@ -74,7 +74,6 @@ fun WordGrid() {
     CardRow()
     CardRow()
     CardRow()
-
 }
 
 
@@ -139,6 +138,20 @@ fun MyCard(text: String) {
 }
 
 @Composable
+fun CardRow() {
+    guessArray.chunked(6).forEach { rowCards ->
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            rowCards.forEach {
+                    MyCard(it)
+            }
+        }
+    }
+}
+
+@Composable
 fun MyKeyboardButton(text: String, width: Int) {
 
     val buttonColour by remember {
@@ -147,10 +160,8 @@ fun MyKeyboardButton(text: String, width: Int) {
 
     Button(
         onClick = {
-            guessArray.add(text)
-            println(viewModel.guessArray.size)
-            viewModel.cards[viewModel.row] = text
-            viewModel.row++
+            guessArray[viewModel.column] = text
+            viewModel.column += 1
         },
         modifier = Modifier
             .width(width.dp)
@@ -190,18 +201,4 @@ fun MyEnterButton() {
         colors = ButtonDefaults.buttonColors(backgroundColor = Color.LightGray)
     )
     { Text(text = "Enter", textAlign = TextAlign.Center) }
-}
-
-@Composable
-fun CardRow() {
-    viewModel.cards.chunked(6).forEach { rowCards ->
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            rowCards.forEach {
-                MyCard(it)
-            }
-        }
-    }
 }
