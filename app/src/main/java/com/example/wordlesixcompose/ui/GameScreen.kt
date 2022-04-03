@@ -22,6 +22,8 @@ import com.example.wordlesixcompose.R
 
 val viewModel = HomeViewModel()
 val guessArray = viewModel.guessArray
+var currentRow = viewModel.currentRow
+var column = viewModel.column
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
@@ -70,10 +72,6 @@ fun Title() {
 @Composable
 fun WordGrid() {
     CardRow()
-    CardRow()
-    CardRow()
-    CardRow()
-    CardRow()
 }
 
 
@@ -118,12 +116,18 @@ fun Keyboard() {
 
 @Composable
 fun MyCard(text: String) {
+
+    val cardColour by remember {
+        mutableStateOf(Color.White)
+    }
+
     Card(
+
         modifier = Modifier
             .padding(4.dp, 8.dp)
             .height(55.dp)
             .aspectRatio(1f),
-        backgroundColor = Color.White,
+        backgroundColor = cardColour,
         border = BorderStroke(2.dp, Color.Black),
     ) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -131,7 +135,7 @@ fun MyCard(text: String) {
                 text = text,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
-                )
+            )
         }
 
     }
@@ -139,13 +143,13 @@ fun MyCard(text: String) {
 
 @Composable
 fun CardRow() {
-    guessArray.chunked(6).forEach { rowCards ->
+    guessArray.forEach { rowCards ->
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             rowCards.forEach {
-                    MyCard(it)
+                MyCard(it)
             }
         }
     }
@@ -160,8 +164,8 @@ fun MyKeyboardButton(text: String, width: Int) {
 
     Button(
         onClick = {
-            guessArray[viewModel.column] = text
-            viewModel.column += 1
+            guessArray[currentRow ][column] = text
+            column += 1
         },
         modifier = Modifier
             .width(width.dp)
@@ -176,7 +180,7 @@ fun MyKeyboardButton(text: String, width: Int) {
 @Composable
 fun MyBackButton() {
     Button(
-        onClick = { viewModel.removeLetter()},
+        onClick = { viewModel.removeLetter() },
         modifier = Modifier
             .width(50.dp)
             .height(60.dp)
