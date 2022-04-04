@@ -23,8 +23,6 @@ import com.example.wordlesixcompose.R
 
 val viewModel = HomeViewModel()
 val guessArray = viewModel.guessArray
-var currentRow = viewModel.currentRow
-var column = viewModel.column
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
@@ -75,20 +73,20 @@ fun Keyboard() {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
         val rowOneKeys = arrayOf("Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P")
         rowOneKeys.forEach {
-            MyKeyboardButton(it, 35 )
+            MyKeyboardButton(it, 35)
         }
     }
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
         val rowTwoKeys = arrayOf("A", "S", "D", "F", "G", "H", "J", "K", "L")
         rowTwoKeys.forEach {
-            MyKeyboardButton(it, 40 )
+            MyKeyboardButton(it, 40)
         }
     }
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
         val rowThreeKeys = arrayOf("Z", "X", "C", "V", "B", "N", "M")
         MyEnterButton()
         rowThreeKeys.forEach {
-            MyKeyboardButton(it, 37 )
+            MyKeyboardButton(it, 37)
         }
         MyBackButton()
 
@@ -145,8 +143,7 @@ fun MyKeyboardButton(text: String, width: Int) {
 
     Button(
         onClick = {
-                guessArray[currentRow][column] = text
-                column += 1
+            viewModel.addLettersToGrid(text)
         },
         modifier = Modifier
             .width(width.dp)
@@ -185,8 +182,10 @@ fun MyEnterButton() {
             .padding(0.dp, 2.dp),
         colors = ButtonDefaults.buttonColors(backgroundColor = Color.LightGray)
     )
-    { Icon(
-        Icons.Filled.CheckCircle,
-        contentDescription = "Enter"
-    ) }
+    {
+        Icon(
+            Icons.Filled.CheckCircle,
+            contentDescription = "Enter"
+        )
+    }
 }
