@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -70,45 +71,25 @@ fun Title() {
 }
 
 @Composable
-fun WordGrid() {
-    CardRow()
-}
-
-
-@Composable
 fun Keyboard() {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-        MyKeyboardButton(text = "Q", 35)
-        MyKeyboardButton(text = "W", 35)
-        MyKeyboardButton(text = "E", 35)
-        MyKeyboardButton(text = "R", 35)
-        MyKeyboardButton(text = "T", 35)
-        MyKeyboardButton(text = "Y", 35)
-        MyKeyboardButton(text = "U", 35)
-        MyKeyboardButton(text = "I", 35)
-        MyKeyboardButton(text = "O", 35)
-        MyKeyboardButton(text = "P", 35)
+        val rowOneKeys = arrayOf("Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P")
+        rowOneKeys.forEach {
+            MyKeyboardButton(it, 35 )
+        }
     }
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-        MyKeyboardButton(text = "A", width = 40)
-        MyKeyboardButton(text = "S", width = 40)
-        MyKeyboardButton(text = "D", width = 40)
-        MyKeyboardButton(text = "F", width = 40)
-        MyKeyboardButton(text = "G", width = 40)
-        MyKeyboardButton(text = "H", width = 40)
-        MyKeyboardButton(text = "J", width = 40)
-        MyKeyboardButton(text = "K", width = 40)
-        MyKeyboardButton(text = "L", width = 40)
+        val rowTwoKeys = arrayOf("A", "S", "D", "F", "G", "H", "J", "K", "L")
+        rowTwoKeys.forEach {
+            MyKeyboardButton(it, 40 )
+        }
     }
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+        val rowThreeKeys = arrayOf("Z", "X", "C", "V", "B", "N", "M")
         MyEnterButton()
-        MyKeyboardButton(text = "Z", width = 35)
-        MyKeyboardButton(text = "X", width = 36)
-        MyKeyboardButton(text = "C", width = 36)
-        MyKeyboardButton(text = "V", width = 36)
-        MyKeyboardButton(text = "B", width = 36)
-        MyKeyboardButton(text = "N", width = 36)
-        MyKeyboardButton(text = "M", width = 36)
+        rowThreeKeys.forEach {
+            MyKeyboardButton(it, 37 )
+        }
         MyBackButton()
 
     }
@@ -142,7 +123,7 @@ fun MyCard(text: String) {
 }
 
 @Composable
-fun CardRow() {
+fun WordGrid() {
     guessArray.forEach { rowCards ->
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -164,8 +145,8 @@ fun MyKeyboardButton(text: String, width: Int) {
 
     Button(
         onClick = {
-            guessArray[currentRow ][column] = text
-            column += 1
+                guessArray[currentRow][column] = text
+                column += 1
         },
         modifier = Modifier
             .width(width.dp)
@@ -199,10 +180,13 @@ fun MyEnterButton() {
     Button(
         onClick = { viewModel.checkLetterPlacementIsCorrect() },
         modifier = Modifier
-            .width(70.dp)
+            .width(50.dp)
             .height(60.dp)
             .padding(0.dp, 2.dp),
         colors = ButtonDefaults.buttonColors(backgroundColor = Color.LightGray)
     )
-    { Text(text = "Enter", textAlign = TextAlign.Center) }
+    { Icon(
+        Icons.Filled.CheckCircle,
+        contentDescription = "Enter"
+    ) }
 }
