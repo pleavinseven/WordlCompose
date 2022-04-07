@@ -34,17 +34,25 @@ class HomeViewModel : ViewModel() {
 
     fun checkLetterPlacementIsCorrect() {
         if (column == 6) {
-                guessArray[currentRow].forEachIndexed { index, letter ->
-                    if (letter[0] == word[index]) {
-                        println("$index green")
-                    } else if( letter in word){
-                        println("$index yellow")
-                    } else{
-                        println("$index gray")
-                    }
+            // remove letters form copies and check against each other to make sure yellow only called once
+            val copyWord = word.map { it }.toMutableList()
+            val copyGuess = guessArray[currentRow].map { it }.toMutableList()
+            guessArray[currentRow].forEachIndexed { index, letter ->
+                if (letter[0] == word[index]) {
+                    println("green")
+                    copyGuess.remove(letter)
+                    copyWord.remove(letter[0])
                 }
-            rowChecked = true
+            }
+
+            for (item in copyWord) {
+                if (item.toString() in copyGuess) {
+                    println("yellow")
+                }
+            }
         }
+
+        rowChecked = true
     }
 
 
