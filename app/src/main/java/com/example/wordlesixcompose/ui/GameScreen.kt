@@ -73,20 +73,20 @@ fun Keyboard() {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
         val rowOneKeys = arrayOf("Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P")
         rowOneKeys.forEach {
-            MyKeyboardButton(it, 35)
+            MyKeyboardButton(it, 35, Color.LightGray)
         }
     }
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
         val rowTwoKeys = arrayOf("A", "S", "D", "F", "G", "H", "J", "K", "L")
         rowTwoKeys.forEach {
-            MyKeyboardButton(it, 40)
+            MyKeyboardButton(it, 40, Color.LightGray)
         }
     }
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
         val rowThreeKeys = arrayOf("Z", "X", "C", "V", "B", "N", "M")
         MyEnterButton()
         rowThreeKeys.forEach {
-            MyKeyboardButton(it, 37)
+            MyKeyboardButton(it, 37, Color.LightGray)
         }
         MyBackButton()
 
@@ -94,19 +94,14 @@ fun Keyboard() {
 }
 
 @Composable
-fun MyCard(text: String) {
-
-    val cardColour by remember {
-        mutableStateOf(Color.White)
-    }
+fun MyCard(text: String, colour: Color) {
 
     Card(
-
         modifier = Modifier
             .padding(4.dp, 8.dp)
             .height(55.dp)
             .aspectRatio(1f),
-        backgroundColor = cardColour,
+        backgroundColor = colour,
         border = BorderStroke(2.dp, Color.Black),
     ) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -128,17 +123,17 @@ fun WordGrid() {
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             rowCards.forEach {
-                MyCard(it)
+                MyCard(it.text, it.colour)
             }
         }
     }
 }
 
 @Composable
-fun MyKeyboardButton(text: String, width: Int) {
+fun MyKeyboardButton(text: String, width: Int, colour: Color) {
 
     val buttonColour by remember {
-        mutableStateOf(Color.LightGray)
+        mutableStateOf(colour)
     }
 
     Button(
