@@ -4,8 +4,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.delay
 
-data class CardData(val text: String, var colour: Color)
+data class CardData(var text: String, var colour: Color)
 
 class HomeViewModel : ViewModel() {
 
@@ -51,20 +52,23 @@ class HomeViewModel : ViewModel() {
                     copyWord.remove(letter.text[0])
 
 
-                    // sort this ->
+                    // TODO: refine this -> yellowused needs fixing. last letter cannot be yellow?
 
 
-                } else if (letter.text in word) {
+                } else if (letter.text in copyWord.toString()) {
                     for (cardData in guessArray[currentRow]) {
                         if (cardData.text == letter.text && cardData.colour == Color.Yellow) {
                             yellowUsed = true
                         }
-                        when (yellowUsed) {
-                            !yellowUsed -> letter.colour = Color.Yellow
-                            else -> letter.colour = Color.DarkGray
+                        if (!yellowUsed) {
+                            letter.colour = Color.Yellow
+                            copyWord.remove(letter.text[0])
                         }
+
+                        else letter.colour = Color.DarkGray
                         yellowUsed = false
-                    }
+                        }
+
                 } else {
                     letter.colour = Color.DarkGray
                 }
@@ -83,6 +87,7 @@ class HomeViewModel : ViewModel() {
         }
     }
 }
+
 
 // if letter was ever green, button is always green.
 // guess letters can be green or yellow?
