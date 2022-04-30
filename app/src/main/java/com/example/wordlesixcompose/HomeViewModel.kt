@@ -34,7 +34,7 @@ class HomeViewModel : ViewModel() {
                     rowChecked = false
                     currentRow++
                     column = 0
-                    guessArray[currentRow][column] = CardData(text, Color.White)
+                    addLettersToGrid(text)
                 }
             }
         }
