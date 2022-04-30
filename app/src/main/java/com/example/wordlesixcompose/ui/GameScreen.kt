@@ -22,7 +22,6 @@ import com.example.wordlesixcompose.R
 
 
 val viewModel = HomeViewModel()
-val guessArray = viewModel.guessArray
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
@@ -117,7 +116,7 @@ fun MyCard(text: String, colour: Color) {
 
 @Composable
 fun WordGrid() {
-    guessArray.forEach { rowCards ->
+    viewModel.guessArray.forEach { rowCards ->
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly

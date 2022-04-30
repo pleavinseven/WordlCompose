@@ -3,8 +3,12 @@ package com.example.wordlesixcompose
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 data class CardData(var text: String, var colour: Color)
 
@@ -12,13 +16,11 @@ class HomeViewModel : ViewModel() {
 
 
     var currentRow = 0
-
-    //    val guessArray = List(5) { List(6) { "" }.toMutableStateList() }
     val guessArray = List(5) { List(6) { CardData("", Color.White) }.toMutableStateList() }
     var column = 0
     var rowChecked = false
     val word = "GUNMAN"
-    // mutable colour for background
+
 
     fun addLettersToGrid(text: String) {
         try {
@@ -40,41 +42,28 @@ class HomeViewModel : ViewModel() {
 
 
     fun checkLetterPlacementIsCorrect() {
+        val copyWord = word.map { it }.toMutableList()
         if (column == 6) {
-            // remove letters form copies and check against each other to make sure yellow only called once
-            var yellowUsed = false
-            val copyWord = word.map { it }.toMutableList()
-            val copyGuess = guessArray[currentRow].map { it }.toMutableList()
-            guessArray[currentRow].forEachIndexed { index, letter ->
-                if (letter.text[0] == word[index]) {
-                    letter.colour = Color.Green
-                    copyGuess.remove(letter)
+            // remove letters from copies and check against each other to make sure yellow only called once
+            for (i in guessArray[currentRow].indices) {
+                val letter = guessArray[currentRow][i]
+                if (letter.text[0] == word[i]) {
+                    guessArray[currentRow][i] = letter.copy(colour = Color.Green)
                     copyWord.remove(letter.text[0])
-
-
-                    // TODO: refine this -> yellowused needs fixing. last letter cannot be yellow?
-
-
-                } else if (letter.text in copyWord.toString()) {
-                    for (cardData in guessArray[currentRow]) {
-                        if (cardData.text == letter.text && cardData.colour == Color.Yellow) {
-                            yellowUsed = true
-                        }
-                        if (!yellowUsed) {
-                            letter.colour = Color.Yellow
-                            copyWord.remove(letter.text[0])
-                        }
-
-                        else letter.colour = Color.DarkGray
-                        yellowUsed = false
-                        }
-
-                } else {
-                    letter.colour = Color.DarkGray
+                }
+            }
+            for (i in guessArray[currentRow].indices) {
+                val letter = guessArray[currentRow][i]
+                if (letter.colour != Color.Green) {
+                    if (letter.text in copyWord.toString()) {
+                        guessArray[currentRow][i] = letter.copy(colour = Color.Yellow)
+                        copyWord.remove(letter.text[0])
+                    } else {
+                        guessArray[currentRow][i] = letter.copy(colour = Color.DarkGray)
+                    }
                 }
             }
         }
-
         rowChecked = true
     }
 
