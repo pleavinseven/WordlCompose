@@ -18,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.wordlesixcompose.HomeViewModel
+import com.example.wordlesixcompose.KeyData
 import com.example.wordlesixcompose.R
 
 
@@ -70,22 +71,21 @@ fun Title() {
 @Composable
 fun Keyboard() {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-        val rowOneKeys = arrayOf("Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P")
-        rowOneKeys.forEach {
-            MyKeyboardButton(it, 35, Color.LightGray)
+        viewModel.rowOneKeys.forEach {
+            MyKeyboardButton(it, 35, Color(238, 238, 238))
         }
     }
+
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-        val rowTwoKeys = arrayOf("A", "S", "D", "F", "G", "H", "J", "K", "L")
-        rowTwoKeys.forEach {
-            MyKeyboardButton(it, 40, Color.LightGray)
+        viewModel.rowTwoKeys.forEach {
+            MyKeyboardButton(it, 40, Color(238, 238, 238))
         }
     }
+
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-        val rowThreeKeys = arrayOf("Z", "X", "C", "V", "B", "N", "M")
         MyEnterButton()
-        rowThreeKeys.forEach {
-            MyKeyboardButton(it, 37, Color.LightGray)
+        viewModel.rowThreeKeys.forEach {
+            MyKeyboardButton(it, 37, Color(238, 238, 238))
         }
         MyBackButton()
 
@@ -157,11 +157,11 @@ fun MyBackButton() {
             .width(50.dp)
             .height(60.dp)
             .padding(0.dp, 2.dp),
-        colors = ButtonDefaults.buttonColors(backgroundColor = Color.LightGray)
+        colors = ButtonDefaults.buttonColors(backgroundColor = Color(238, 238, 238))
     ) {
         Icon(
             Icons.Filled.KeyboardArrowLeft,
-            contentDescription = "Back"
+            contentDescription = "Remove last letter"
         )
     }
 }
@@ -169,7 +169,10 @@ fun MyBackButton() {
 @Composable
 fun MyEnterButton() {
     Button(
-        onClick = { viewModel.checkLetterPlacementIsCorrect() },
+        onClick = {
+            viewModel.checkLetterPlacementIsCorrect()
+            viewModel.checkKeyboard()
+        },
         modifier = Modifier
             .width(50.dp)
             .height(60.dp)
