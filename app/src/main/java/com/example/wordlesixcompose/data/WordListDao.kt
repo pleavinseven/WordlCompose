@@ -1,8 +1,8 @@
-package com.example.wordlesixcompose.database
+package com.example.wordlesixcompose.data
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.example.wordlesixcompose.database.model.WordList
+import com.example.wordlesixcompose.data.model.WordList
 
 @Dao
 interface WordListDao {

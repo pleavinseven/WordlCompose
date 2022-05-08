@@ -1,10 +1,10 @@
-package com.example.wordlesixcompose.database
+package com.example.wordlesixcompose.data
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.wordlesixcompose.database.model.WordList
+import com.example.wordlesixcompose.data.model.WordList
 
 
 @Database(entities = [WordList::class], version = 2)
