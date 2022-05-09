@@ -22,7 +22,7 @@ import com.example.wordlesixcompose.KeyData
 import com.example.wordlesixcompose.R
 
 
-val viewModel = HomeViewModel()
+private val viewModel = HomeViewModel()
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
@@ -71,21 +71,21 @@ fun Title() {
 @Composable
 fun Keyboard() {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-        viewModel.rowOneKeys.forEach {
-            MyKeyboardButton(it, 35, Color(238, 238, 238))
+        viewModel.firstRowKeyboard.forEach {
+            MyKeyboardButton(it.text, it.size, it.colour)
         }
     }
 
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-        viewModel.rowTwoKeys.forEach {
-            MyKeyboardButton(it, 40, Color(238, 238, 238))
+        viewModel.secondRowKeyboard.forEach {
+            MyKeyboardButton(it.text, it.size, it.colour)
         }
     }
 
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
         MyEnterButton()
-        viewModel.rowThreeKeys.forEach {
-            MyKeyboardButton(it, 37, Color(238, 238, 238))
+        viewModel.thirdRowKeyboard.forEach {
+            MyKeyboardButton(it.text, it.size, it.colour)
         }
         MyBackButton()
 
@@ -143,7 +143,8 @@ fun MyKeyboardButton(text: String, width: Int, colour: Color) {
             .width(width.dp)
             .height(60.dp)
             .padding(0.dp, 2.dp),
-        colors = ButtonDefaults.buttonColors(backgroundColor = buttonColour)
+        colors = ButtonDefaults.buttonColors(backgroundColor = buttonColour),
+        border = BorderStroke(2.dp, Color.LightGray)
     ) {
         Text(text = text, textAlign = TextAlign.Center)
     }
@@ -157,7 +158,8 @@ fun MyBackButton() {
             .width(50.dp)
             .height(60.dp)
             .padding(0.dp, 2.dp),
-        colors = ButtonDefaults.buttonColors(backgroundColor = Color(238, 238, 238))
+        colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
+        border = BorderStroke(2.dp, Color.LightGray)
     ) {
         Icon(
             Icons.Filled.KeyboardArrowLeft,
@@ -177,7 +179,8 @@ fun MyEnterButton() {
             .width(50.dp)
             .height(60.dp)
             .padding(0.dp, 2.dp),
-        colors = ButtonDefaults.buttonColors(backgroundColor = Color.LightGray)
+        colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
+        border = BorderStroke(2.dp, Color.LightGray)
     )
     {
         Icon(
