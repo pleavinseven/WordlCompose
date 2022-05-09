@@ -1,29 +1,25 @@
 package com.example.wordlesixcompose
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.graphics.Color
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 
 data class CardData(var text: String, var colour: Color)
-data class KeyData(var text: String, var colour: Color)
+data class KeyData(var text: String, val size: Int, var colour: Color)
 
 class HomeViewModel : ViewModel() {
 
-
-    var currentRow = 0
+    private var currentRow = 0
     val guessArray = List(5) { List(6) { CardData("", Color.White) }.toMutableStateList() }
-    var column = 0
+    private var column = 0
     var rowChecked = false
-    val word = "GUNMAN"
-    val rowOneKeys = arrayOf("Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P")
-    val rowTwoKeys = arrayOf("A", "S", "D", "F", "G", "H", "J", "K", "L")
-    val rowThreeKeys = arrayOf("Z", "X", "C", "V", "B", "N", "M")
+    private val word = "LOVES"
+    val firstRowKeyboard = "QWERTYUIOP".toCharArray()
+        .map { symbol: Char -> KeyData(text = symbol.toString(), 35, Color.White) }
+    val secondRowKeyboard = "ASDFGHJKL".toCharArray()
+        .map { symbol: Char -> KeyData(text = symbol.toString(), 35, Color.White) }
+    val thirdRowKeyboard = "ZXCVBNM".toCharArray()
+        .map { symbol: Char -> KeyData(text = symbol.toString(), 35, Color.White) }
 
 
     fun addLettersToGrid(text: String) {
