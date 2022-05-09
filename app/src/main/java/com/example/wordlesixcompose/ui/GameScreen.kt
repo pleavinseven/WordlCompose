@@ -131,10 +131,6 @@ fun WordGrid() {
 @Composable
 fun MyKeyboardButton(text: String, width: Int, colour: Color) {
 
-    val buttonColour by remember {
-        mutableStateOf(colour)
-    }
-
     Button(
         onClick = {
             viewModel.addLettersToGrid(text)
@@ -143,7 +139,7 @@ fun MyKeyboardButton(text: String, width: Int, colour: Color) {
             .width(width.dp)
             .height(60.dp)
             .padding(0.dp, 2.dp),
-        colors = ButtonDefaults.buttonColors(backgroundColor = buttonColour),
+        colors = ButtonDefaults.buttonColors(backgroundColor = colour),
         border = BorderStroke(2.dp, Color.LightGray)
     ) {
         Text(text = text, textAlign = TextAlign.Center)

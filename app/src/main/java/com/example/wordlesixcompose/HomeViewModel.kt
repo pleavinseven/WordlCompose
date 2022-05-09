@@ -5,21 +5,25 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 
 data class CardData(var text: String, var colour: Color)
-data class KeyData(var text: String, val size: Int, var colour: Color)
+data class KeyData(var text: String, val size: Int, val colour: Color)
 
 class HomeViewModel : ViewModel() {
 
     private var currentRow = 0
+    private val green = Color(46, 125, 50)
     val guessArray = List(5) { List(6) { CardData("", Color.White) }.toMutableStateList() }
     private var column = 0
     var rowChecked = false
-    private val word = "LOVES"
-    val firstRowKeyboard = "QWERTYUIOP".toCharArray()
-        .map { symbol: Char -> KeyData(text = symbol.toString(), 35, Color.White) }
+    private val word = "LOVERS"
+    private var greenLetterList = mutableListOf<String>()
+    private var yellowLetterList = mutableListOf<String>()
+    private var grayLetterList = mutableListOf<String>()
+    val firstRowKeyboard = listOf("Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P")
+        .map { text: String -> KeyData(text, 35, Color.White) }.toMutableStateList()
     val secondRowKeyboard = "ASDFGHJKL".toCharArray()
-        .map { symbol: Char -> KeyData(text = symbol.toString(), 35, Color.White) }
+        .map { text: Char -> KeyData(text.toString(), 35, Color.White) }.toMutableStateList()
     val thirdRowKeyboard = "ZXCVBNM".toCharArray()
-        .map { symbol: Char -> KeyData(text = symbol.toString(), 35, Color.White) }
+        .map { text: Char -> KeyData(text.toString(), 35, Color.White) }.toMutableStateList()
 
 
     fun addLettersToGrid(text: String) {
@@ -43,7 +47,6 @@ class HomeViewModel : ViewModel() {
 
     fun checkLetterPlacementIsCorrect() {
         val copyWord = word.map { it }.toMutableList()
-        val green = Color(46, 125, 50)
         if (column == 6) {
             // remove letters from copies and check against each other to make sure yellow only called once
             for (i in guessArray[currentRow].indices) {
@@ -51,6 +54,9 @@ class HomeViewModel : ViewModel() {
                 if (letter.text[0] == word[i]) {
                     guessArray[currentRow][i] = letter.copy(colour = green)
                     copyWord.remove(letter.text[0])
+                    // add letter to list for keyboard
+                    greenLetterList += letter.text
+
                 }
             }
             for (i in guessArray[currentRow].indices) {
@@ -59,8 +65,12 @@ class HomeViewModel : ViewModel() {
                     if (letter.text in copyWord.toString()) {
                         guessArray[currentRow][i] = letter.copy(colour = Color.Yellow)
                         copyWord.remove(letter.text[0])
+                        // add letter to list for keyboard
+                        yellowLetterList += letter.text
                     } else {
                         guessArray[currentRow][i] = letter.copy(colour = Color.DarkGray)
+                        // add letter to list for keyboard
+                        grayLetterList += letter.text
                     }
                 }
             }
@@ -69,7 +79,34 @@ class HomeViewModel : ViewModel() {
     }
 
     fun checkKeyboard() {
+        val rows = arrayOf(firstRowKeyboard, secondRowKeyboard, thirdRowKeyboard)
+        for (row in rows) {
+            for (i in 0..9) {
+                try {
+                    val letter = row[i]
+                    if (letter.colour == green || letter.colour == Color.DarkGray) {
+                        continue
+                    } else {
+                        if (letter.text in yellowLetterList) {
+                            row[i] = letter.copy(text = letter.text, colour = Color.Yellow)
+                            continue
+                        }
 
+                        if (letter.text in greenLetterList) {
+                            row[i] = letter.copy(text = letter.text, colour = green)
+                            continue
+                        }
+
+                        if (letter.text in grayLetterList) {
+                            row[i] = letter.copy(text = letter.text, colour = Color.DarkGray)
+                        }
+                    }
+                } catch (e: java.lang.IndexOutOfBoundsException){
+                    continue
+                }
+
+            }
+        }
     }
 
     fun removeLetter() {
@@ -81,7 +118,3 @@ class HomeViewModel : ViewModel() {
         }
     }
 }
-
-
-// if letter was ever green, button is always green.
-// guess letters can be green or yellow?
