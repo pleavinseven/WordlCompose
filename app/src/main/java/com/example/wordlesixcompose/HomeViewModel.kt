@@ -1,8 +1,16 @@
 package com.example.wordlesixcompose
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.net.HttpURLConnection
+import java.net.URL
+
 
 data class CardData(var text: String, var colour: Color)
 data class KeyData(var text: String, val size: Int, val colour: Color)
@@ -46,9 +54,10 @@ class HomeViewModel : ViewModel() {
 
 
     fun checkLetterPlacementIsCorrect() {
-        val copyWord = word.map { it }.toMutableList()
         if (column == 6) {
+            val copyWord = word.map { it }.toMutableList()
             // remove letters from copies and check against each other to make sure yellow only called once
+
             for (i in guessArray[currentRow].indices) {
                 val letter = guessArray[currentRow][i]
                 if (letter.text[0] == word[i]) {
@@ -101,12 +110,30 @@ class HomeViewModel : ViewModel() {
                             row[i] = letter.copy(text = letter.text, colour = Color.DarkGray)
                         }
                     }
-                } catch (e: java.lang.IndexOutOfBoundsException){
+                } catch (e: java.lang.IndexOutOfBoundsException) {
                     continue
                 }
-
             }
         }
+    }
+
+    suspend fun checkWordExists(): Boolean {
+        // API call: returns true if word is in dictionary
+        var guess = ""
+        var exists = false
+        for (i in guessArray[currentRow].indices) {
+            guess += guessArray[currentRow][i].text.lowercase()
+        }
+        val job = CoroutineScope(Dispatchers.IO).launch {
+            val url = URL("https://api.dictionaryapi.dev/api/v2/entries/en/$guess")
+            val urlConnection = url.openConnection() as HttpURLConnection
+            val responseCode = urlConnection.responseCode
+            if (responseCode in 200..299) {
+                exists = true
+            }
+        }
+        job.join()
+        return exists
     }
 
     fun removeLetter() {
@@ -116,5 +143,9 @@ class HomeViewModel : ViewModel() {
         } catch (e: IndexOutOfBoundsException) {
 
         }
+    }
+
+    fun toastWordNotFound(context: Context) {
+        Toast.makeText(context, "Word does not exist", Toast.LENGTH_SHORT).show()
     }
 }
