@@ -6,7 +6,7 @@ import com.example.wordlesixcompose.data.model.WordList
 
 @Dao
 interface WordListDao {
-    @Query("SELECT * FROM wordlist ORDER BY  id ASC")
+    @Query("SELECT word FROM wordlist WHERE used = 0 ORDER BY id DESC LIMIT 1")
     fun readWord(): LiveData<List<WordList>>
 
     @Update
