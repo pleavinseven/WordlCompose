@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import com.example.wordlesixcompose.data.model.WordList
 
 
-@Database(entities = [WordList::class], version = 2)
+@Database(entities = [WordList::class], version = 1)
 abstract class WordListDatabase : RoomDatabase() {
 
     abstract fun wordlistDao(): WordListDao
@@ -17,12 +17,18 @@ abstract class WordListDatabase : RoomDatabase() {
         var INSTANCE: WordListDatabase? = null
 
         fun getDatabase(context: Context): WordListDatabase {
-            return INSTANCE ?: synchronized(this) {
+            val tempInstance = INSTANCE
+            if (tempInstance != null) {
+                return tempInstance
+            }
+            synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     WordListDatabase::class.java,
                     "word_list_database"
-                ).fallbackToDestructiveMigration().build()
+                ).createFromAsset(
+                    "database/word_list.db"
+                ).build()
                 INSTANCE = instance
                 return instance
             }

@@ -1,5 +1,6 @@
 package com.example.wordlesixcompose.ui
 
+import android.app.Application
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -23,11 +24,12 @@ import com.example.wordlesixcompose.R
 import kotlinx.coroutines.launch
 
 
-private val viewModel = HomeViewModel()
+
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun HomeScreen() {
+    val viewModel = HomeViewModel(LocalContext.current.applicationContext as Application)
     Column(
         modifier = Modifier
             .fillMaxWidth(),
@@ -43,7 +45,7 @@ fun HomeScreen() {
                 .fillMaxWidth()
                 .weight(1f)
         ) {
-            WordGrid()
+            WordGrid(viewModel)
         }
         Column(
             modifier = Modifier
@@ -51,7 +53,7 @@ fun HomeScreen() {
                 .padding(0.dp, 4.dp),
             verticalArrangement = Arrangement.Bottom
         ) {
-            Keyboard()
+            Keyboard(viewModel)
         }
     }
 }
@@ -70,25 +72,25 @@ fun Title() {
 }
 
 @Composable
-fun Keyboard() {
+fun Keyboard(viewModel: HomeViewModel) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
         viewModel.firstRowKeyboard.forEach {
-            MyKeyboardButton(it.text, it.size, it.colour)
+            MyKeyboardButton(viewModel, it.text, it.size, it.colour)
         }
     }
 
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
         viewModel.secondRowKeyboard.forEach {
-            MyKeyboardButton(it.text, it.size, it.colour)
+            MyKeyboardButton(viewModel, it.text, it.size, it.colour)
         }
     }
 
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-        MyEnterButton()
+        MyEnterButton(viewModel)
         viewModel.thirdRowKeyboard.forEach {
-            MyKeyboardButton(it.text, it.size, it.colour)
+            MyKeyboardButton(viewModel, it.text, it.size, it.colour)
         }
-        MyBackButton()
+        MyBackButton(viewModel)
 
     }
 }
@@ -116,7 +118,7 @@ fun MyCard(text: String, colour: Color) {
 }
 
 @Composable
-fun WordGrid() {
+fun WordGrid(viewModel: HomeViewModel) {
     viewModel.guessArray.forEach { rowCards ->
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -130,7 +132,7 @@ fun WordGrid() {
 }
 
 @Composable
-fun MyKeyboardButton(text: String, width: Int, colour: Color) {
+fun MyKeyboardButton(viewModel: HomeViewModel, text: String, width: Int, colour: Color) {
 
     Button(
         onClick = {
@@ -148,7 +150,7 @@ fun MyKeyboardButton(text: String, width: Int, colour: Color) {
 }
 
 @Composable
-fun MyBackButton() {
+fun MyBackButton(viewModel: HomeViewModel) {
     Button(
         onClick = { viewModel.removeLetter() },
         modifier = Modifier
@@ -166,7 +168,7 @@ fun MyBackButton() {
 }
 
 @Composable
-fun MyEnterButton() {
+fun MyEnterButton(viewModel: HomeViewModel) {
     val coroutineScope = rememberCoroutineScope()
     val mContext = LocalContext.current
     Button(
