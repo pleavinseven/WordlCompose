@@ -2,15 +2,11 @@ package com.example.wordlesixcompose
 
 import android.app.Application
 import android.content.Context
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.graphics.Color
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
-import com.example.wordlesixcompose.data.WordListDao
+import androidx.lifecycle.*
 import com.example.wordlesixcompose.data.WordListDatabase
-import com.example.wordlesixcompose.data.model.WordList
 import com.example.wordlesixcompose.data.repository.WordRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,30 +15,28 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 
-
 data class CardData(var text: String, var colour: Color)
 data class KeyData(var text: String, val size: Int, val colour: Color)
 
 class HomeViewModel(application: Application) : ViewModel() {
 
     private val repository: WordRepository
-    private var tword: LiveData<String>
+    private lateinit var word: String
 
     init {
         val wordDb = WordListDatabase.getDatabase(application)
         val wordDao = wordDb.wordlistDao()
         repository = WordRepository(wordDao)
-        tword = repository.readWordData
-        Log.d("TAG", ": ${tword.value}")
-
+        viewModelScope.launch {
+            word = repository.readWord().uppercase() // retrieve word from database
+        }
     }
 
     private var currentRow = 0
-    private val green = Color(46, 125, 50)
+    private val green = Color(46, 125, 50) // TODO: remove this
     val guessArray = List(5) { List(6) { CardData("", Color.White) }.toMutableStateList() }
     private var column = 0
     var rowChecked = false
-    private val word = "LOVELY"
     private var greenLetterList = mutableListOf<String>()
     private var yellowLetterList = mutableListOf<String>()
     private var grayLetterList = mutableListOf<String>()
@@ -119,13 +113,13 @@ class HomeViewModel(application: Application) : ViewModel() {
                     if (letter.colour == green || letter.colour == Color.DarkGray) {
                         continue
                     } else {
-                        if (letter.text in yellowLetterList) {
-                            row[i] = letter.copy(text = letter.text, colour = Color.Yellow)
+                        if (letter.text in greenLetterList) {
+                            row[i] = letter.copy(text = letter.text, colour = green)
                             continue
                         }
 
-                        if (letter.text in greenLetterList) {
-                            row[i] = letter.copy(text = letter.text, colour = green)
+                        if (letter.text in yellowLetterList) {
+                            row[i] = letter.copy(text = letter.text, colour = Color.Yellow)
                             continue
                         }
 
@@ -133,7 +127,7 @@ class HomeViewModel(application: Application) : ViewModel() {
                             row[i] = letter.copy(text = letter.text, colour = Color.DarkGray)
                         }
                     }
-                // not all rows are length 9: catch anything longer
+                    // not all rows are length 9: catch anything longer
                 } catch (e: java.lang.IndexOutOfBoundsException) {
                     continue
                 }
@@ -165,7 +159,7 @@ class HomeViewModel(application: Application) : ViewModel() {
             guessArray[currentRow][column - 1] = CardData("", Color.White)
             column--
         } catch (e: IndexOutOfBoundsException) {
-
+            // do nothing
         }
     }
 
