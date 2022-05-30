@@ -1,6 +1,7 @@
 package com.example.wordlesixcompose.ui
 
 import android.app.Application
+import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -22,7 +23,6 @@ import androidx.compose.ui.unit.sp
 import com.example.wordlesixcompose.HomeViewModel
 import com.example.wordlesixcompose.R
 import kotlinx.coroutines.launch
-
 
 
 
@@ -136,7 +136,9 @@ fun MyKeyboardButton(viewModel: HomeViewModel, text: String, width: Int, colour:
 
     Button(
         onClick = {
-            viewModel.addLettersToGrid(text)
+            if (viewModel.gameIsInPlay) {
+                viewModel.addLettersToGrid(text)
+            }
         },
         modifier = Modifier
             .width(width.dp)
@@ -152,7 +154,11 @@ fun MyKeyboardButton(viewModel: HomeViewModel, text: String, width: Int, colour:
 @Composable
 fun MyBackButton(viewModel: HomeViewModel) {
     Button(
-        onClick = { viewModel.removeLetter() },
+        onClick = {
+            if (viewModel.gameIsInPlay) {
+                viewModel.removeLetter()
+            }
+        },
         modifier = Modifier
             .width(50.dp)
             .height(60.dp)
@@ -173,12 +179,14 @@ fun MyEnterButton(viewModel: HomeViewModel) {
     val mContext = LocalContext.current
     Button(
         onClick = {
-            coroutineScope.launch {
-                if (viewModel.checkWordExists()) {
-                    viewModel.checkLetterPlacementIsCorrect()
-                    viewModel.checkKeyboard()
-                } else {
-                    viewModel.toastWordNotFound(mContext)
+            if (viewModel.gameIsInPlay) {
+                coroutineScope.launch {
+                    if (viewModel.checkWordExists()) {
+                        viewModel.checkLetterPlacementIsCorrect()
+                        viewModel.checkKeyboard()
+                    } else {
+                        viewModel.toastWordNotFound(mContext)
+                    }
                 }
             }
         },
