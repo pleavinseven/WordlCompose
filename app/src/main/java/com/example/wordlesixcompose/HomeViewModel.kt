@@ -78,6 +78,8 @@ class HomeViewModel(application: Application) : ViewModel() {
                 gameIsInPlay = false
             }
             // remove letters from copies and check against each other to make sure yellow only called once
+            // val guess cannot be used here because it is a string only,
+            // guessArray[currentRow] contains more info such as colour of the square
             for (i in guessArray[currentRow].indices) {
                 val letter = guessArray[currentRow][i]
                 if (letter.text[0] == word[i]) {
