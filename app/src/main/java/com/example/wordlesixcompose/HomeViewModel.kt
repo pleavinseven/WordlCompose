@@ -20,6 +20,7 @@ data class KeyData(var text: String, val size: Int, val colour: Color)
 
 class HomeViewModel(application: Application) : ViewModel() {
 
+    var gameIsInPlay = true
     private val repository: WordRepository
     private lateinit var word: String
 
@@ -71,8 +72,12 @@ class HomeViewModel(application: Application) : ViewModel() {
         //change card colours for each letter
         if (column == 6) {
             val copyWord = word.map { it }.toMutableList()
+            val guess = guessArray[currentRow].joinToString("") { it.text }
+            if (guess == word) {
+                // if guess is correct buttons are blocked
+                gameIsInPlay = false
+            }
             // remove letters from copies and check against each other to make sure yellow only called once
-
             for (i in guessArray[currentRow].indices) {
                 val letter = guessArray[currentRow][i]
                 if (letter.text[0] == word[i]) {
