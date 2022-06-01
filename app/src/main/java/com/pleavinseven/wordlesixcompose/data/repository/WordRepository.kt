@@ -1,6 +1,6 @@
-package com.example.wordlesixcompose.data.repository
+package com.pleavinseven.wordlesixcompose.data.repository
 
-import com.example.wordlesixcompose.data.WordListDao
+import com.pleavinseven.wordlesixcompose.data.WordListDao
 
 class WordRepository(private val wordListDao: WordListDao) {
 

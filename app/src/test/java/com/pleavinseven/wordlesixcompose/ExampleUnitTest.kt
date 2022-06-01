@@ -1,4 +1,4 @@
-package com.example.wordlesixcompose
+package com.pleavinseven.wordlesixcompose
 
 import org.junit.Test
 

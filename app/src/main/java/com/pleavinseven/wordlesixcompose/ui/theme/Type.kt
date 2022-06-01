@@ -1,4 +1,4 @@
-package com.example.wordlesixcompose.ui.theme
+package com.pleavinseven.wordlesixcompose.ui.theme
 
 import androidx.compose.material.Typography
 import androidx.compose.ui.text.TextStyle

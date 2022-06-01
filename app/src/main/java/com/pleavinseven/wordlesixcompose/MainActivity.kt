@@ -1,4 +1,4 @@
-package com.example.wordlesixcompose
+package com.pleavinseven.wordlesixcompose
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -6,8 +6,8 @@ import androidx.activity.compose.setContent
 import androidx.compose.material.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.wordlesixcompose.ui.HomeScreen
-import com.example.wordlesixcompose.ui.Title
+import com.pleavinseven.wordlesixcompose.ui.HomeScreen
+import com.pleavinseven.wordlesixcompose.ui.Title
 
 
 class MainActivity : ComponentActivity() {

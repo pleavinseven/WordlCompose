@@ -1,4 +1,4 @@
-package com.example.wordlesixcompose.data
+package com.pleavinseven.wordlesixcompose.data
 
 import androidx.room.*
 
