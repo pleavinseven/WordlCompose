@@ -1,15 +1,18 @@
-package com.example.wordlesixcompose
+package com.pleavinseven.wordlesixcompose
 
 import android.app.Application
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.*
-import com.example.wordlesixcompose.data.WordListDatabase
-import com.example.wordlesixcompose.data.repository.WordRepository
+import com.pleavinseven.wordlesixcompose.data.WordListDatabase
+import com.pleavinseven.wordlesixcompose.data.repository.WordRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import java.net.HttpURLConnection
 import java.net.URL
@@ -20,7 +23,7 @@ data class KeyData(var text: String, val size: Int, val colour: Color)
 
 class HomeViewModel(application: Application) : ViewModel() {
 
-    var gameIsInPlay = true
+    var gameIsInPlay = mutableStateOf(true)
     private val repository: WordRepository
     private lateinit var word: String
 
@@ -74,8 +77,7 @@ class HomeViewModel(application: Application) : ViewModel() {
             val copyWord = word.map { it }.toMutableList()
             val guess = guessArray[currentRow].joinToString("") { it.text }
             if (guess == word) {
-                // if guess is correct buttons are blocked
-                gameIsInPlay = false
+                gameWon()
             }
             // remove letters from copies and check against each other to make sure yellow only called once
             // val guess cannot be used here because it is a string only,
@@ -107,6 +109,11 @@ class HomeViewModel(application: Application) : ViewModel() {
             }
         }
         rowChecked = true
+    }
+
+    private fun gameWon() {
+        // if guess is correct buttons are blocked
+        gameIsInPlay.value = false
     }
 
     fun checkKeyboard() {

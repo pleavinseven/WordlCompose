@@ -1,4 +1,4 @@
-package com.example.wordlesixcompose.ui
+package com.pleavinseven.wordlesixcompose.ui
 
 import android.app.Application
 import android.content.Context
@@ -18,12 +18,13 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.wordlesixcompose.HomeViewModel
+import androidx.compose.ui.window.PopupProperties
+import com.pleavinseven.wordlesixcompose.HomeViewModel
 import com.example.wordlesixcompose.R
 import kotlinx.coroutines.launch
-
 
 
 @Preview(showBackground = true, showSystemUi = true)
@@ -56,6 +57,7 @@ fun HomeScreen() {
             Keyboard(viewModel)
         }
     }
+    GameWinPopUp(viewModel = viewModel)
 }
 
 
@@ -94,6 +96,7 @@ fun Keyboard(viewModel: HomeViewModel) {
 
     }
 }
+
 
 @Composable
 fun MyCard(text: String, colour: Color) {
@@ -136,7 +139,7 @@ fun MyKeyboardButton(viewModel: HomeViewModel, text: String, width: Int, colour:
 
     Button(
         onClick = {
-            if (viewModel.gameIsInPlay) {
+            if (viewModel.gameIsInPlay.value) {
                 viewModel.addLettersToGrid(text)
             }
         },
@@ -155,7 +158,7 @@ fun MyKeyboardButton(viewModel: HomeViewModel, text: String, width: Int, colour:
 fun MyBackButton(viewModel: HomeViewModel) {
     Button(
         onClick = {
-            if (viewModel.gameIsInPlay) {
+            if (viewModel.gameIsInPlay.value) {
                 viewModel.removeLetter()
             }
         },
@@ -177,9 +180,10 @@ fun MyBackButton(viewModel: HomeViewModel) {
 fun MyEnterButton(viewModel: HomeViewModel) {
     val coroutineScope = rememberCoroutineScope()
     val mContext = LocalContext.current
+
     Button(
         onClick = {
-            if (viewModel.gameIsInPlay) {
+            if (viewModel.gameIsInPlay.value) {
                 coroutineScope.launch {
                     if (viewModel.checkWordExists()) {
                         viewModel.checkLetterPlacementIsCorrect()
@@ -204,3 +208,34 @@ fun MyEnterButton(viewModel: HomeViewModel) {
         )
     }
 }
+
+@Composable
+fun GameWinPopUp(viewModel: HomeViewModel) {
+    val openDialog = remember { mutableStateOf(viewModel.gameIsInPlay) }
+    if (!openDialog.value.value) {
+        AlertDialog(
+            onDismissRequest = { openDialog.value.value = true },
+            title = { Text(text = "Congrats", color = Color.Black) },
+            shape = MaterialTheme.shapes.medium,
+            backgroundColor = MaterialTheme.colors.surface,
+            buttons = {
+                Row(
+                    modifier = Modifier.padding(all = 8.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Button(
+
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            openDialog.value.value = true
+                        }
+                    ) {
+                        Text("Dismiss")
+                    }
+                }
+            }
+        )
+    }
+}
+
+
