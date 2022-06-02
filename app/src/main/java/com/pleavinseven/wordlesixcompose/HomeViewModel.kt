@@ -24,16 +24,13 @@ data class KeyData(var text: String, val size: Int, val colour: Color)
 class HomeViewModel(application: Application) : ViewModel() {
 
     var gameIsInPlay = mutableStateOf(true)
-    private val repository: WordRepository
     private lateinit var word: String
+    private val wordDb = WordListDatabase.getDatabase(application)
+    private val wordDao = wordDb.wordlistDao()
+    private val repository = WordRepository(wordDao)
 
     init {
-        val wordDb = WordListDatabase.getDatabase(application)
-        val wordDao = wordDb.wordlistDao()
-        repository = WordRepository(wordDao)
-        viewModelScope.launch {
-            word = repository.readWord().uppercase() // retrieve word from database
-        }
+        getWord()
     }
 
     private var currentRow = 0
@@ -52,6 +49,12 @@ class HomeViewModel(application: Application) : ViewModel() {
         .map { text: Char -> KeyData(text.toString(), 35, Color.White) }.toMutableStateList()
 
 
+    fun getWord(){
+        viewModelScope.launch {
+            word = repository.readWord().uppercase() // retrieve word from database
+        }
+    }
+    
     fun addLettersToGrid(text: String) {
         try {
             guessArray[currentRow][column] = CardData(text, Color.White)
