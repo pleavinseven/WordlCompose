@@ -4,11 +4,11 @@ import androidx.room.*
 
 @Dao
 interface WordListDao {
-    @Query("SELECT word FROM wordlist WHERE used = 0 ORDER BY id DESC LIMIT 1")
+    @Query("SELECT word FROM wordlist WHERE used = 0 LIMIT 1")
     suspend fun readWord(): String
 
-//    @Update
-//    suspend fun updateWord(word: WordList)
+    @Query("UPDATE wordlist SET used = 1 WHERE word = :usedWord")
+    suspend fun updateWord(usedWord: String)
 }
 
 
