@@ -57,7 +57,7 @@ fun HomeScreen() {
             Keyboard(viewModel)
         }
     }
-    GameWinPopUp(viewModel = viewModel)
+    GameEndPopUp(viewModel = viewModel)
 }
 
 
@@ -210,29 +210,26 @@ fun MyEnterButton(viewModel: HomeViewModel) {
 }
 
 @Composable
-fun GameWinPopUp(viewModel: HomeViewModel) {
+fun GameEndPopUp(viewModel: HomeViewModel) {
     val openDialog = remember { mutableStateOf(viewModel.gameIsInPlay) }
     if (!openDialog.value.value) {
         AlertDialog(
             onDismissRequest = { openDialog.value.value = true },
-            title = { Text(text = "Congrats", color = Color.Black) },
+            title = { Text(text = "Congrats! The word was ${viewModel.word}!", color = Color.Black) },
             shape = MaterialTheme.shapes.medium,
             backgroundColor = MaterialTheme.colors.surface,
-            buttons = {
-                Row(
-                    modifier = Modifier.padding(all = 8.dp),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Button(
-
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = {
-                            openDialog.value.value = true
-                        }
-                    ) {
-                        Text("Dismiss")
-                    }
-                }
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        openDialog.value.value = true
+                    },
+                    modifier = Modifier
+                        .width(53.dp)
+                        .height(50.dp),
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
+                    border = BorderStroke(2.dp, Color.LightGray),
+                )
+                { Text(text = "Next Word") }
             }
         )
     }
