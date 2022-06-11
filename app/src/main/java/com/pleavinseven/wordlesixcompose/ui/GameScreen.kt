@@ -1,14 +1,30 @@
 package com.pleavinseven.wordlesixcompose.ui
 
 import android.app.Application
-import android.content.Context
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Card
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,19 +34,44 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.PopupProperties
-import com.pleavinseven.wordlesixcompose.HomeViewModel
 import com.example.wordlesixcompose.R
-import kotlinx.coroutines.launch
+import com.pleavinseven.wordlesixcompose.HomeViewModel
+import com.pleavinseven.wordlesixcompose.ui.model.Game
+import com.pleavinseven.wordlesixcompose.ui.model.GameState
+import com.pleavinseven.wordlesixcompose.ui.model.Guess
+import com.pleavinseven.wordlesixcompose.ui.model.Keyboard
 
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun HomeScreen() {
-    val viewModel = HomeViewModel(LocalContext.current.applicationContext as Application)
+fun HomeScreen(viewModel: HomeViewModel = HomeViewModel(LocalContext.current.applicationContext as Application)) {
+    val context = LocalContext.current
+    val gameState = viewModel.gameState
+    (gameState.value as? GameState.InProgress)?.let {
+        HomeContent(
+            game = it.game,
+            showGameEndPopUp = it.showGameEndPopUp,
+            onKeyClick = { viewModel.onKeyClicked(it) },
+            onSubmitClick = { viewModel.onSubmitClick(context) },
+            onBackspaceClick = { viewModel.onBackspaceClick() },
+            onDismissGameEndPopUp = { viewModel.onDismissGameEndPopUp() },
+            onNextWordClick = { viewModel.onNextWordClick() }
+        )
+    }
+}
+
+@Composable
+private fun HomeContent(
+    game: Game,
+    showGameEndPopUp: Boolean,
+    onKeyClick: (String) -> Unit,
+    onSubmitClick: () -> Unit,
+    onBackspaceClick: () -> Unit,
+    onDismissGameEndPopUp: () -> Unit,
+    onNextWordClick: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth(),
@@ -46,7 +87,7 @@ fun HomeScreen() {
                 .fillMaxWidth()
                 .weight(1f)
         ) {
-            WordGrid(viewModel)
+            WordGrid(game.guesses)
         }
         Column(
             modifier = Modifier
@@ -54,10 +95,20 @@ fun HomeScreen() {
                 .padding(0.dp, 4.dp),
             verticalArrangement = Arrangement.Bottom
         ) {
-            Keyboard(viewModel)
+            KeyboardView(
+                keyboard = game.keyboard,
+                onKeyClick = { text -> onKeyClick(text) },
+                onSubmitClick = { onSubmitClick() },
+                onBackspaceClick = { onBackspaceClick() }
+            )
         }
     }
-    GameEndPopUp(viewModel = viewModel)
+        GameEndPopUp(
+            showGameEndPopUp,
+            word = game.word,
+            onDismiss = onDismissGameEndPopUp,
+            onNextWordClick = onNextWordClick
+        )
 }
 
 
@@ -74,26 +125,30 @@ fun Title() {
 }
 
 @Composable
-fun Keyboard(viewModel: HomeViewModel) {
+fun KeyboardView(
+    keyboard: Keyboard,
+    onKeyClick: (String) -> Unit,
+    onSubmitClick: () -> Unit,
+    onBackspaceClick: () -> Unit
+) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-        viewModel.firstRowKeyboard.forEach {
-            MyKeyboardButton(viewModel, it.text, it.size, it.colour)
+        keyboard.firstRow.forEach {
+            MyKeyboardButton(it.text, it.colour, onClick = { onKeyClick(it.text) })
         }
     }
 
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-        viewModel.secondRowKeyboard.forEach {
-            MyKeyboardButton(viewModel, it.text, it.size, it.colour)
+        keyboard.secondRow.forEach {
+            MyKeyboardButton(it.text, it.colour, onClick = { onKeyClick(it.text) })
         }
     }
 
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-        MyEnterButton(viewModel)
-        viewModel.thirdRowKeyboard.forEach {
-            MyKeyboardButton(viewModel, it.text, it.size, it.colour)
+        MyEnterButton(onSubmitClick)
+        keyboard.thirdRow.forEach {
+            MyKeyboardButton(it.text, it.colour, onClick = { onKeyClick(it.text) })
         }
-        MyBackButton(viewModel)
-
+        MyBackButton(onBackspaceClick)
     }
 }
 
@@ -121,13 +176,13 @@ fun MyCard(text: String, colour: Color) {
 }
 
 @Composable
-fun WordGrid(viewModel: HomeViewModel) {
-    viewModel.guessArray.forEach { rowCards ->
+fun WordGrid(guesses: List<Guess>) {
+    guesses.forEach { guess ->
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            rowCards.forEach {
+            guess.cards.forEach {
                 MyCard(it.text, it.colour)
             }
         }
@@ -135,16 +190,12 @@ fun WordGrid(viewModel: HomeViewModel) {
 }
 
 @Composable
-fun MyKeyboardButton(viewModel: HomeViewModel, text: String, width: Int, colour: Color) {
+fun MyKeyboardButton(text: String, colour: Color, onClick: () -> Unit) {
 
     Button(
-        onClick = {
-            if (viewModel.gameIsInPlay.value) {
-                viewModel.addLettersToGrid(text)
-            }
-        },
+        onClick = onClick,
         modifier = Modifier
-            .width(width.dp)
+            .width(35.dp)
             .height(60.dp)
             .padding(0.dp, 2.dp),
         colors = ButtonDefaults.buttonColors(backgroundColor = colour),
@@ -155,13 +206,9 @@ fun MyKeyboardButton(viewModel: HomeViewModel, text: String, width: Int, colour:
 }
 
 @Composable
-fun MyBackButton(viewModel: HomeViewModel) {
+fun MyBackButton(onClick: () -> Unit) {
     Button(
-        onClick = {
-            if (viewModel.gameIsInPlay.value) {
-                viewModel.removeLetter()
-            }
-        },
+        onClick = onClick,
         modifier = Modifier
             .width(50.dp)
             .height(60.dp)
@@ -177,23 +224,9 @@ fun MyBackButton(viewModel: HomeViewModel) {
 }
 
 @Composable
-fun MyEnterButton(viewModel: HomeViewModel) {
-    val coroutineScope = rememberCoroutineScope()
-    val mContext = LocalContext.current
-
+fun MyEnterButton(onClick: () -> Unit) {
     Button(
-        onClick = {
-            if (viewModel.gameIsInPlay.value) {
-                coroutineScope.launch {
-                    if (viewModel.checkWordExists()) {
-                        viewModel.checkLetterPlacementIsCorrect()
-                        viewModel.checkKeyboard()
-                    } else {
-                        viewModel.toastWordNotFound(mContext)
-                    }
-                }
-            }
-        },
+        onClick = onClick,
         modifier = Modifier
             .width(50.dp)
             .height(60.dp)
@@ -210,19 +243,26 @@ fun MyEnterButton(viewModel: HomeViewModel) {
 }
 
 @Composable
-fun GameEndPopUp(viewModel: HomeViewModel) {
-    val openDialog = remember { mutableStateOf(viewModel.gameIsInPlay) }
-    if (!openDialog.value.value) {
+fun GameEndPopUp(
+    showGameEndPopUp: Boolean,
+    word: String,
+    onDismiss: () -> Unit,
+    onNextWordClick: () -> Unit
+) {
+    if (showGameEndPopUp) {
         AlertDialog(
-            onDismissRequest = { openDialog.value.value = true },
-            title = { Text(text = "Congrats! The word was ${viewModel.word}!", color = Color.Black) },
+            onDismissRequest = onDismiss,
+            title = {
+                Text(
+                    text = "Congrats! The word was $word!",
+                    color = Color.Black
+                )
+            },
             shape = MaterialTheme.shapes.medium,
             backgroundColor = MaterialTheme.colors.surface,
             confirmButton = {
                 TextButton(
-                    onClick = {
-                        openDialog.value.value = true
-                    },
+                    onClick = onNextWordClick,
                     modifier = Modifier
                         .width(53.dp)
                         .height(50.dp),
