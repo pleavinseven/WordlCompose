@@ -222,6 +222,7 @@ fun GameEndPopUp(viewModel: HomeViewModel) {
                 TextButton(
                     onClick = {
                         openDialog.value.value = true
+                        viewModel.newGame()
                     },
                     modifier = Modifier
                         .width(53.dp)

@@ -3,7 +3,6 @@ package com.pleavinseven.wordlesixcompose
 import android.app.Application
 import android.content.Context
 import android.widget.Toast
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.graphics.Color
@@ -12,7 +11,6 @@ import com.pleavinseven.wordlesixcompose.data.WordListDatabase
 import com.pleavinseven.wordlesixcompose.data.repository.WordRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import java.net.HttpURLConnection
 import java.net.URL
@@ -24,7 +22,7 @@ data class KeyData(var text: String, val size: Int, val colour: Color)
 class HomeViewModel(application: Application) : ViewModel() {
 
     var gameIsInPlay = mutableStateOf(true)
-    private lateinit var word: String
+    lateinit var word: String
     private val wordDb = WordListDatabase.getDatabase(application)
     private val wordDao = wordDb.wordlistDao()
     private val repository = WordRepository(wordDao)
@@ -34,8 +32,9 @@ class HomeViewModel(application: Application) : ViewModel() {
     }
 
     private var currentRow = 0
-    private val green = Color(46, 125, 50) // TODO: remove this
-    val guessArray = List(5) { List(6) { CardData("", Color.White) }.toMutableStateList() }
+    private val green = Color(46, 125, 50)
+    private val yellow = Color(245, 212, 66)
+    var guessArray = List(5) { List(6) { CardData("", Color.White) }.toMutableStateList() }
     private var column = 0
     var rowChecked = false
     private var greenLetterList = mutableListOf<String>()
@@ -49,12 +48,12 @@ class HomeViewModel(application: Application) : ViewModel() {
         .map { text: Char -> KeyData(text.toString(), 35, Color.White) }.toMutableStateList()
 
 
-    fun getWord(){
+    private fun getWord() {
         viewModelScope.launch {
             word = repository.readWord().uppercase() // retrieve word from database
         }
     }
-    
+
     fun addLettersToGrid(text: String) {
         try {
             guessArray[currentRow][column] = CardData(text, Color.White)
@@ -79,9 +78,6 @@ class HomeViewModel(application: Application) : ViewModel() {
         if (column == 6) {
             val copyWord = word.map { it }.toMutableList()
             val guess = guessArray[currentRow].joinToString("") { it.text }
-            if (guess == word) {
-                gameWon()
-            }
             // remove letters from copies and check against each other to make sure yellow only called once
             // val guess cannot be used here because it is a string only,
             // guessArray[currentRow] contains more info such as colour of the square
@@ -99,7 +95,7 @@ class HomeViewModel(application: Application) : ViewModel() {
                 val letter = guessArray[currentRow][i]
                 if (letter.colour != green) {
                     if (letter.text in copyWord.toString()) {
-                        guessArray[currentRow][i] = letter.copy(colour = Color.Yellow)
+                        guessArray[currentRow][i] = letter.copy(colour = yellow)
                         copyWord.remove(letter.text[0])
                         // add letter to list for keyboard
                         yellowLetterList += letter.text
@@ -110,13 +106,26 @@ class HomeViewModel(application: Application) : ViewModel() {
                     }
                 }
             }
+            if (guess == word) {
+                // if guess is correct buttons are blocked
+                gameIsInPlay.value = false
+                newGame()
+            }
         }
         rowChecked = true
     }
 
-    private fun gameWon() {
-        // if guess is correct buttons are blocked
-        gameIsInPlay.value = false
+    fun newGame() {
+        greenLetterList.clear()
+        grayLetterList.clear()
+        yellowLetterList.clear()
+        guessArray = List(5) { List(6) { CardData("", Color.White) }.toMutableStateList() }
+        currentRow = 0
+        column = 0
+        viewModelScope.launch {
+            repository.updateWord(word) // change this so it only happens if you got the word?
+            word = repository.readWord() // retrieve word from database
+        }
     }
 
     fun checkKeyboard() {
@@ -136,7 +145,7 @@ class HomeViewModel(application: Application) : ViewModel() {
                         }
 
                         if (letter.text in yellowLetterList) {
-                            row[i] = letter.copy(text = letter.text, colour = Color.Yellow)
+                            row[i] = letter.copy(text = letter.text, colour = yellow)
                             continue
                         }
 
