@@ -1,10 +1,10 @@
-package com.pleavinseven.wordlesixcompose.data
+package com.pleavinseven.wordlesixcompose.database
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.pleavinseven.wordlesixcompose.data.model.WordList
+import com.pleavinseven.wordlesixcompose.database.model.WordList
 
 
 @Database(entities = [WordList::class], version = 1)

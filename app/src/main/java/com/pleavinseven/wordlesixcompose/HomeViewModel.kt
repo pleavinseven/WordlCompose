@@ -7,8 +7,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.*
-import com.pleavinseven.wordlesixcompose.data.WordListDatabase
-import com.pleavinseven.wordlesixcompose.data.repository.WordRepository
+import com.pleavinseven.wordlesixcompose.database.WordListDatabase
+import com.pleavinseven.wordlesixcompose.database.repository.WordRepository
+import com.pleavinseven.wordlesixcompose.ui.theme.Green
+import com.pleavinseven.wordlesixcompose.ui.theme.Yellow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -32,8 +34,6 @@ class HomeViewModel(application: Application) : ViewModel() {
     }
 
     private var currentRow = 0
-    private val green = Color(46, 125, 50)
-    private val yellow = Color(245, 212, 66)
     var guessArray = List(5) { List(6) { CardData("", Color.White) }.toMutableStateList() }
     private var column = 0
     var rowChecked = false
@@ -84,7 +84,7 @@ class HomeViewModel(application: Application) : ViewModel() {
             for (i in guessArray[currentRow].indices) {
                 val letter = guessArray[currentRow][i]
                 if (letter.text[0] == word[i]) {
-                    guessArray[currentRow][i] = letter.copy(colour = green)
+                    guessArray[currentRow][i] = letter.copy(colour = Green)
                     copyWord.remove(letter.text[0])
                     // add letter to list for keyboard
                     greenLetterList += letter.text
@@ -93,9 +93,9 @@ class HomeViewModel(application: Application) : ViewModel() {
             }
             for (i in guessArray[currentRow].indices) {
                 val letter = guessArray[currentRow][i]
-                if (letter.colour != green) {
+                if (letter.colour != Green) {
                     if (letter.text in copyWord.toString()) {
-                        guessArray[currentRow][i] = letter.copy(colour = yellow)
+                        guessArray[currentRow][i] = letter.copy(colour = Yellow)
                         copyWord.remove(letter.text[0])
                         // add letter to list for keyboard
                         yellowLetterList += letter.text
@@ -136,16 +136,16 @@ class HomeViewModel(application: Application) : ViewModel() {
                 try {
                     val letter = row[i]
                     // green or gray keys cannot be changed
-                    if (letter.colour == green || letter.colour == Color.DarkGray) {
+                    if (letter.colour == Green || letter.colour == Color.DarkGray) {
                         continue
                     } else {
                         if (letter.text in greenLetterList) {
-                            row[i] = letter.copy(text = letter.text, colour = green)
+                            row[i] = letter.copy(text = letter.text, colour = Green)
                             continue
                         }
 
                         if (letter.text in yellowLetterList) {
-                            row[i] = letter.copy(text = letter.text, colour = yellow)
+                            row[i] = letter.copy(text = letter.text, colour = Yellow)
                             continue
                         }
 

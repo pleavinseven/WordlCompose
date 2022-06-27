@@ -1,4 +1,4 @@
-package com.pleavinseven.wordlesixcompose.data.model
+package com.pleavinseven.wordlesixcompose.database.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
