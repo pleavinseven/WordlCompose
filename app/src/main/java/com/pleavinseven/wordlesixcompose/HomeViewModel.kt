@@ -3,61 +3,65 @@ package com.pleavinseven.wordlesixcompose
 import android.app.Application
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.toMutableStateList
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.*
 import com.pleavinseven.wordlesixcompose.database.WordListDatabase
 import com.pleavinseven.wordlesixcompose.database.repository.WordRepository
-import com.pleavinseven.wordlesixcompose.ui.theme.Green
-import com.pleavinseven.wordlesixcompose.ui.theme.Yellow
+import com.pleavinseven.wordlesixcompose.ui.model.Game
+import com.pleavinseven.wordlesixcompose.ui.model.GameState
+import com.pleavinseven.wordlesixcompose.ui.model.Letter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.net.HttpURLConnection
 import java.net.URL
 
-
-data class CardData(var text: String, var colour: Color)
-data class KeyData(var text: String, val size: Int, val colour: Color)
-
 class HomeViewModel(application: Application) : ViewModel() {
 
-    var gameIsInPlay = mutableStateOf(true)
-    lateinit var word: String
     private val wordDb = WordListDatabase.getDatabase(application)
     private val wordDao = wordDb.wordlistDao()
     private val repository = WordRepository(wordDao)
 
-    init {
-        getWord()
+    private val _gameState: MutableState<GameState> = mutableStateOf(GameState.NotStarted)
+    val gameState: State<GameState> by lazy {
+        startGame()
+        _gameState
     }
 
     private var currentRow = 0
-    var guessArray = List(5) { List(6) { CardData("", Color.White) }.toMutableStateList() }
     private var column = 0
     var rowChecked = false
-    private var greenLetterList = mutableListOf<String>()
-    private var yellowLetterList = mutableListOf<String>()
-    private var grayLetterList = mutableListOf<String>()
-    val firstRowKeyboard = listOf("Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P")
-        .map { text: String -> KeyData(text, 35, Color.White) }.toMutableStateList()
-    val secondRowKeyboard = "ASDFGHJKL".toCharArray()
-        .map { text: Char -> KeyData(text.toString(), 35, Color.White) }.toMutableStateList()
-    val thirdRowKeyboard = "ZXCVBNM".toCharArray()
-        .map { text: Char -> KeyData(text.toString(), 35, Color.White) }.toMutableStateList()
 
-
-    private fun getWord() {
+    private fun startGame() {
         viewModelScope.launch {
-            word = repository.readWord().uppercase() // retrieve word from database
+            // retrieve word from database
+            _gameState.value = GameState.InProgress(
+                game = Game(word = repository.readWord().uppercase()),
+                showGameEndPopUp = false
+            )
         }
     }
 
-    fun addLettersToGrid(text: String) {
+
+    fun onKeyClicked(text: String) {
         try {
-            guessArray[currentRow][column] = CardData(text, Color.White)
+            val gameStateInProgress = _gameState.value as GameState.InProgress
+            val game = gameStateInProgress.game
+            val currentGuesses = game.guesses
+            val guess = currentGuesses[currentRow]
+            val updatedGuess = guess.copy(cards = guess.cards.mapIndexed { i, card ->
+                if (i == column) {
+                    Letter.Unknown(text)
+                } else card
+            })
             column += 1
+            val updatedGame =
+                game.copy(guesses = currentGuesses.mapIndexed { i, currentGuess ->
+                    if (i == currentRow) updatedGuess else currentGuess
+                })
+            _gameState.value = gameStateInProgress.copy(game = updatedGame)
         } catch (e: java.lang.IndexOutOfBoundsException) {
             if (currentRow == 4) {
                 // cant go beyond currentRow index 4 -- do nothing
@@ -66,108 +70,104 @@ class HomeViewModel(application: Application) : ViewModel() {
                     rowChecked = false
                     currentRow++
                     column = 0
-                    addLettersToGrid(text)
+                    onKeyClicked(text)
                 }
             }
         }
     }
 
 
-    fun checkLetterPlacementIsCorrect() {
+
+    private fun checkLetterPlacementIsCorrect() {
         //change card colours for each letter
         if (column == 6) {
+            val game = (_gameState.value as GameState.InProgress).game
+            val word = game.word
             val copyWord = word.map { it }.toMutableList()
-            val guess = guessArray[currentRow].joinToString("") { it.text }
-            // remove letters from copies and check against each other to make sure yellow only called once
-            // val guess cannot be used here because it is a string only,
-            // guessArray[currentRow] contains more info such as colour of the square
-            for (i in guessArray[currentRow].indices) {
-                val letter = guessArray[currentRow][i]
-                if (letter.text[0] == word[i]) {
-                    guessArray[currentRow][i] = letter.copy(colour = Green)
-                    copyWord.remove(letter.text[0])
-                    // add letter to list for keyboard
-                    greenLetterList += letter.text
+            val currentGuesses = game.guesses
+            val currentGuess = currentGuesses[currentRow]
+            val greenLetterList = game.greenLetters.toMutableList()
+            val yellowLetterList = game.yellowLetters.toMutableList()
+            val grayLetterList = game.grayLetters.toMutableList()
 
-                }
-            }
-            for (i in guessArray[currentRow].indices) {
-                val letter = guessArray[currentRow][i]
-                if (letter.colour != Green) {
-                    if (letter.text in copyWord.toString()) {
-                        guessArray[currentRow][i] = letter.copy(colour = Yellow)
-                        copyWord.remove(letter.text[0])
+            val updatedCards = currentGuess.cards.mapIndexed { index, card ->
+                when {
+                    card.text[0] == word[index] -> {
+                        copyWord.remove(card.text[0])
                         // add letter to list for keyboard
-                        yellowLetterList += letter.text
-                    } else {
-                        guessArray[currentRow][i] = letter.copy(colour = Color.DarkGray)
+                        greenLetterList += card.text
+                        Letter.CorrectLetterInRightPosition(card.text)
+                    }
+                    card.text in copyWord.toString() -> {
+                        copyWord.remove(card.text[0])
                         // add letter to list for keyboard
-                        grayLetterList += letter.text
+                        yellowLetterList += card.text
+                        Letter.CorrectLetterInWrongPosition(card.text)
+                    }
+                    else -> {
+                        // add letter to list for keyboard
+                        grayLetterList += card.text
+                        Letter.IncorrectLetter(card.text)
                     }
                 }
             }
-            if (guess == word) {
-                // if guess is correct buttons are blocked
-                gameIsInPlay.value = false
-                newGame()
-            }
+
+            val guessWord = currentGuess.cards.joinToString("") { it.text }
+            val showGameEndPopUp = guessWord == word
+
+            _gameState.value =
+                GameState.InProgress(
+                    game = game.copy(
+                        guesses = game.guesses.mapIndexed { index, guess ->
+                            if (index == currentRow) guess.copy(cards = updatedCards) else guess
+                        },
+                        greenLetters = greenLetterList,
+                        yellowLetters = yellowLetterList,
+                        grayLetters = grayLetterList
+                    ),
+                    showGameEndPopUp = showGameEndPopUp
+                )
         }
+
         rowChecked = true
     }
 
-    fun newGame() {
-        greenLetterList.clear()
-        grayLetterList.clear()
-        yellowLetterList.clear()
-        guessArray = List(5) { List(6) { CardData("", Color.White) }.toMutableStateList() }
-        currentRow = 0
-        column = 0
-        viewModelScope.launch {
-            repository.updateWord(word) // change this so it only happens if you got the word?
-            word = repository.readWord() // retrieve word from database
-        }
-    }
 
-    fun checkKeyboard() {
+    private fun checkKeyboard() {
         //change key colours according to correctness
-        val rows = arrayOf(firstRowKeyboard, secondRowKeyboard, thirdRowKeyboard)
-        for (row in rows) {
-            for (i in 0..9) {
-                try {
-                    val letter = row[i]
-                    // green or gray keys cannot be changed
-                    if (letter.colour == Green || letter.colour == Color.DarkGray) {
-                        continue
-                    } else {
-                        if (letter.text in greenLetterList) {
-                            row[i] = letter.copy(text = letter.text, colour = Green)
-                            continue
-                        }
+        val gameStateInProgress = _gameState.value as GameState.InProgress
+        val game = gameStateInProgress.game
+        val keyboard = game.keyboard
 
-                        if (letter.text in yellowLetterList) {
-                            row[i] = letter.copy(text = letter.text, colour = Yellow)
-                            continue
-                        }
+        _gameState.value = gameStateInProgress.copy(
+            game = game.copy(
+                keyboard = keyboard.copy(
+                    firstRow = getUpdatedRow(keyboard.firstRow, game),
+                    secondRow = getUpdatedRow(keyboard.secondRow, game),
+                    thirdRow = getUpdatedRow(keyboard.thirdRow, game)
+                )
+            )
+        )
+    }
 
-                        if (letter.text in grayLetterList) {
-                            row[i] = letter.copy(text = letter.text, colour = Color.DarkGray)
-                        }
-                    }
-                    // not all rows are length 9: catch anything longer
-                } catch (e: java.lang.IndexOutOfBoundsException) {
-                    continue
-                }
-            }
+    private fun getUpdatedRow(
+        row: List<Letter>,
+        game: Game
+    ) = row.map { letter ->
+        when (letter.text) {
+            in game.greenLetters -> Letter.CorrectLetterInRightPosition(letter.text)
+            in game.yellowLetters -> Letter.CorrectLetterInWrongPosition(letter.text)
+            in game.grayLetters -> Letter.IncorrectLetter(letter.text)
+            else -> Letter.Unknown(letter.text)
         }
     }
 
-    suspend fun checkWordExists(): Boolean {
+    private suspend fun checkWordExists(): Boolean {
         // API call: returns true if word is in dictionary
-        var guess = ""
         var exists = false
-        for (i in guessArray[currentRow].indices) {
-            guess += guessArray[currentRow][i].text.lowercase()
-        }
+        val game = (_gameState.value as GameState.InProgress).game
+        val currentGuess = game.guesses[currentRow]
+        val guess = currentGuess.cards.joinToString("") { it.text }.lowercase()
         val job = CoroutineScope(Dispatchers.IO).launch {
             val url = URL("https://api.dictionaryapi.dev/api/v2/entries/en/$guess")
             val urlConnection = url.openConnection() as HttpURLConnection
@@ -180,16 +180,61 @@ class HomeViewModel(application: Application) : ViewModel() {
         return exists
     }
 
-    fun removeLetter() {
+    fun onNextWordClick() {
+        currentRow = 0
+        column = 0
+        viewModelScope.launch {
+            repository.updateWord((_gameState.value as GameState.InProgress).game.word.lowercase())
+            startGame()
+        }
+
+    }
+
+    fun onSubmitClick(context: Context) {
+        viewModelScope.launch {
+            if (checkWordExists()) {
+                checkLetterPlacementIsCorrect()
+                checkKeyboard()
+                currentRow++
+                column = 0
+            } else {
+                toastWordNotFound(context)
+            }
+        }
+    }
+
+    fun onBackspaceClick() {
+        removeLetter()
+    }
+
+    private fun removeLetter() {
         try {
-            guessArray[currentRow][column - 1] = CardData("", Color.White)
+            val game = (_gameState.value as GameState.InProgress).game
+            val currentGuess = game.guesses[currentRow]
+            val updatedGuess =
+                currentGuess.copy(cards = currentGuess.cards.mapIndexed { index, card ->
+                    if (index == column - 1) {
+                        Letter.Unknown("")
+                    } else card
+                })
+            _gameState.value =
+                GameState.InProgress(
+                    game = game.copy(guesses = game.guesses.mapIndexed { index, guess ->
+                        if (index == currentRow) updatedGuess else guess
+                    }),
+                    showGameEndPopUp = false
+                )
             column--
         } catch (e: IndexOutOfBoundsException) {
             // do nothing
         }
     }
 
-    fun toastWordNotFound(context: Context) {
+    private fun toastWordNotFound(context: Context) {
         Toast.makeText(context, "Word does not exist", Toast.LENGTH_SHORT).show()
+    }
+
+    fun onDismissGameEndPopUp() {
+        _gameState.value = (_gameState.value as GameState.InProgress).copy(showGameEndPopUp = false)
     }
 }
