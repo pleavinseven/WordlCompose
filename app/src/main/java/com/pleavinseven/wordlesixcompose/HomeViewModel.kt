@@ -32,7 +32,7 @@ class HomeViewModel(application: Application) : ViewModel() {
 
     private var currentRow = 0
     private var column = 0
-    var rowChecked = false
+    private var rowChecked = false
 
     private fun startGame() {
         viewModelScope.launch {
@@ -128,7 +128,6 @@ class HomeViewModel(application: Application) : ViewModel() {
                     showGameEndPopUp = showGameEndPopUp
                 )
         }
-
         rowChecked = true
     }
 

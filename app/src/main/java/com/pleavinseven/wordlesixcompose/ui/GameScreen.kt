@@ -194,7 +194,7 @@ fun MyBackButton(onClick: () -> Unit) {
             .width(50.dp)
             .height(60.dp)
             .padding(0.dp, 2.dp),
-        colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
+        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.surface),
         border = BorderStroke(2.dp, Color.LightGray)
     ) {
         Icon(
@@ -212,7 +212,7 @@ fun MyEnterButton(onClick: () -> Unit) {
             .width(50.dp)
             .height(60.dp)
             .padding(0.dp, 2.dp),
-        colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
+        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.surface),
         border = BorderStroke(2.dp, Color.LightGray)
     )
     {
@@ -239,7 +239,7 @@ fun GameEndPopUp(
             title = {
                 Text(
                     text = "Congrats! The word was $word!",
-                    color = Color.Black
+                    color = MaterialTheme.colors.onPrimary
                 )
             },
             shape = MaterialTheme.shapes.medium,
@@ -250,7 +250,7 @@ fun GameEndPopUp(
                     modifier = Modifier
                         .width(290.dp)
                         .height(50.dp),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
+                    colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.surface),
                     border = BorderStroke(2.dp, Color.LightGray),
                 )
                 { Text(text = "Next Word") }
