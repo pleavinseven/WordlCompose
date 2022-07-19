@@ -7,8 +7,12 @@
 * [Issues](#issues)
 * [Contact](#contact)
 
+![wordl_half_guess](https://github.com/pleavinseven/WordlCompose/blob/master/readmeimages/wordl_half_guess.png?raw=true)
+![wordl_no_word_1.png](https://github.com/pleavinseven/WordlCompose/blob/master/readmeimages/wordl_no_word_1.png?raw=true)
+![wordl_win_1.png](https://github.com/pleavinseven/WordlCompose/blob/master/readmeimages/wordl_win_1.png?raw=true)
+
 ## General info
-Wordle Clone for android wriiten in kotlin and made using Jetpack Compose UI kit.
+Wordle Clone for android written in kotlin and made using Jetpack Compose UI kit.
 
 The project uses kotlin coroutines to call Dictionaryapi.dev to check for existence of guessed words and a room database to store the correct answers locally on the device.
 
