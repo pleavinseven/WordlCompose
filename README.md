@@ -7,9 +7,9 @@
 * [Issues](#issues)
 * [Contact](#contact)
 
-![wordl_half_guess](https://github.com/pleavinseven/WordlCompose/blob/master/readmeimages/wordl_half_guess.png?raw=true)
-![wordl_no_word_1.png](https://github.com/pleavinseven/WordlCompose/blob/master/readmeimages/wordl_no_word_1.png?raw=true)
-![wordl_win_1.png](https://github.com/pleavinseven/WordlCompose/blob/master/readmeimages/wordl_win_1.png?raw=true)
+![wordl_half_guess](https://github.com/pleavinseven/WordlCompose/blob/master/readmeimages/wordl_half_guess_4_227x479.png?raw=true)
+![wordl_no_word_1.png](https://github.com/pleavinseven/WordlCompose/blob/master/readmeimages/wordl_no_word_2_227x479.png?raw=true)
+![wordl_win_1.png](https://github.com/pleavinseven/WordlCompose/blob/master/readmeimages/wordl_win_1_1_70.png?raw=true)
 
 ## General info
 Wordle Clone for android written in kotlin and made using Jetpack Compose UI kit.
